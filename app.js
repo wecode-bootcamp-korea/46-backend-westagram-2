@@ -4,6 +4,7 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const { DataSource } = require('typeorm');
+const e = require("express");
 
 
 const appDataSource = new DataSource({
@@ -29,8 +30,24 @@ app.use(express.json());
 const port = process.env.PORT
 
 app.get('/ping', function (req, res, next) {    //ping 엔드포인트
-  res.json({message: 'userCreated'})
+  res.json({message: 'pong'})
 })
+
+app.post('/users/signup', async (req, res) => {
+	const { name, email, profileImage, password} = req.body;
+    
+	await appDataSource.query(
+		`INSERT INTO users(
+		    name,
+		    email,
+		    profile_image,
+        password
+		) VALUES (?, ?, ?, ?);
+		`,
+		[ name, email, profileImage, password ]
+	); 
+     res.status(201).json({ message : "successfully created" });
+	})
  
 app.listen(port, function () {
   console.log('server listening on port 8000')

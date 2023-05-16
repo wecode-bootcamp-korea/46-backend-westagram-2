@@ -6,9 +6,9 @@ CREATE TABLE posts(
   user_id INT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id),
-  FOREIGN KEY (user_id) REFERENCES users (id)
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 
 -- migrate:down
-drop table posts
+drop table posts;

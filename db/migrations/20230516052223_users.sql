@@ -12,4 +12,4 @@ CREATE TABLE users (
 
 
 -- migrate:down
-drop TABLE users
+drop TABLE users;

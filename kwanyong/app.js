@@ -1,9 +1,10 @@
-require("dotenv").config();
+require("dotenv").config();     //환경변수를 설정해야하기때문에 제일 상단에 둔다
 
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const { DataSource } = require('typeorm');
+const e = require("express");
 
 
 const appDataSource = new DataSource({
@@ -22,14 +23,31 @@ appDataSource.initialize()
 
 const app = express()
  
-app.use(cors());
+app.use(cors());                  //미들웨어
 app.use(logger('combined'));
+app.use(express.json());
 
 const port = process.env.PORT
 
-app.get('/ping', function (req, res, next) {
+app.get('/ping', function (req, res, next) {    //ping 엔드포인트
   res.json({message: 'pong'})
 })
+
+app.post('/users/signup', async (req, res) => {
+	const { name, email, profileImage, password} = req.body;
+    
+	await appDataSource.query(
+		`INSERT INTO users(
+		    name,
+		    email,
+		    profile_image,
+        password
+		) VALUES (?, ?, ?, ?);
+		`,
+		[ name, email, profileImage, password ]
+	); 
+     res.status(201).json({ message : "successfully created" });
+	})
  
 app.listen(port, function () {
   console.log('server listening on port 8000')

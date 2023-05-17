@@ -26,6 +26,33 @@ app.get("/ping", function (req, res, next) {
   res.json({ message: "pong" });
 });
 
+app.get("/posts/lookup", async (req, res, next) => {
+  try {
+    const query = `
+      SELECT 
+        users.id AS userId, 
+        users.profile_image AS userProfileImage, 
+        posts.id AS postingId, 
+        posts.image_url AS postingImageUrl, 
+        posts.content AS postingContent 
+      FROM users 
+      INNER JOIN posts ON users.id = posts.user_id
+    `;
+
+    appDataSource.manager.query(query, (err, rows) => {
+      if (err) {
+        console.error("Error retrieving post list:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      return res.status(200).json({ data: rows });
+    });
+  } catch (error) {
+    console.error("Error retrieving post list:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 app.post("/users/signup", async (req, res, next) => {
   const { name, email, profileImage, password } = req.body;
 

@@ -12,6 +12,7 @@ const app = express();
 
 app.use(cors());
 app.use(logger("combined"));
+app.use(express.json());
 
 const appDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
@@ -33,6 +34,22 @@ appDataSource
 
 app.get("/ping", function (req, res, next) {
   res.json({ message: "pong" });
+});
+
+app.post("/users/signup", async (req, res, next) => {
+  const { name, email, profileImage, password } = req.body;
+
+  await appDataSource.query(
+    `INSERT INTO users(
+      name,
+      email,
+      profile_image,
+      password
+    ) VALUES (?, ?, ?, ?);
+    `,
+    [name, email, profileImage, password]
+  );
+  res.status(201).json({ message: "userCreated" });
 });
 
 app.listen(port, function () {

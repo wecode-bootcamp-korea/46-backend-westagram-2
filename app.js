@@ -42,11 +42,24 @@ app.post('/users/signup', async (req, res) => {
 		    email,
 		    profile_image,
         password
-		) VALUES (?, ?, ?, ?);
-		`,
+		) VALUES (?, ?, ?, ?);`,
 		[ name, email, profileImage, password ]
 	); 
      res.status(201).json({ message : "successfully created" });
+	})
+
+  app.post('/posts/signup', async(req, res) => {
+    const { usersId, title, content } = req.body;
+    await appDataSource.query(
+      `INSERT INTO posts(
+        user_id,
+		    title,
+		    content
+		) VALUES (?, ?, ?);
+    `,
+    [ usersId, title, content ]
+	); 
+     res.status(201).json({ message : "postCreated" });
 	})
  
 app.listen(port, function () {

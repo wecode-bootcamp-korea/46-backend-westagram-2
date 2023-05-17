@@ -7,8 +7,8 @@ create table comments (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY(id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (post_id) REFERENCES posts(id)
+  CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES posts(id)
 )
 
 -- migrate:down

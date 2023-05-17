@@ -11,4 +11,4 @@ create table comments (
   FOREIGN KEY (post_id) REFERENCES posts(id)
 )
 -- migrate:down
-drop table comments;
+drop table comments;  

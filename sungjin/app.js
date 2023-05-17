@@ -43,6 +43,22 @@ app.post("/users/signup", async (req, res, next) => {
   res.status(201).json({ message: "userCreated" });
 });
 
+app.post("/posts", async (req, res) => {
+  const { title, content, userId } = req.body;
+
+  await appDataSource.query(
+    `INSERT INTO posts(
+          title,
+          content,
+          user_id
+          ) VALUES (?, ?, ?);
+      `,
+    [title, content, userId]
+  );
+
+  res.status(201).json({ message: "postCreated" });
+});
+
 app.listen(3000, () => {
   console.log("Example app listening on 3000");
 });

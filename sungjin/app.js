@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const logger = require("morgan");
 const { DataSource } = require("typeorm");
+
 const appDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
   host: process.env.DB_HOST,
@@ -19,24 +20,29 @@ const app = express();
 
 app.use(cors());
 app.use(logger("dev"));
+app.use(express.json());
+app.use(express.json());
 app.get("/ping", function (req, res, next) {
   res.json({ message: "pong" });
 });
 
 app.post("/users/signup", async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, profileImage, password } = req.body;
 
   await appDataSource.query(
     `INSERT INTO users(
           name,
           email,
+          profile_image,
           password
-      ) VALUES (?, ?, ?, ?);
+          ) VALUES (?, ?, ?, ?);
       `,
-    [name, email, password]
+    [name, email, profileImage, password]
   );
 
   res.status(201).json({ message: "userCreated" });
 });
 
-app.listen(3000);
+app.listen(3000, () => {
+  console.log("Example app listening on 3000");
+});

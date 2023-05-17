@@ -1,4 +1,4 @@
- -- migrate:up
+-- migrate:up
 create table comments (
   id int not null auto_increment,
   content varchar(3000) not null,

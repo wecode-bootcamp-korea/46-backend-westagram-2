@@ -68,55 +68,45 @@ app.post("/posts", async (req, res, next) => {
   res.status(201).json({ message: "postCreated" });
 });
 
-app.get("/posts/look", async (req, res, next) => {
-  await appDataSource.query(
+app.get("/posts", async (req, res, next) => {
+  const result = await appDataSource.query(
     `SELECT
-      users.id as userId,
-      users.profile_image as userProfileImage,
-      posts.id as postingId,
-      posts.image_url as postingImageUrl,
-      posts.content as postingContent
-      FROM users
-      INNER JOIN posts ON users.id = posts.user_id`,
-    (err, rows) => {
-      res.status(200).json({ data: rows });
-    }
+      users.id AS userId,
+      users.profile_image AS userProfileImage,
+      posts.id AS postingId,
+      posts.image_url AS postingImageUrl,
+      posts.content AS postingContent
+    FROM users
+    INNER JOIN posts ON users.id = posts.user_id`
   );
+
+  console.log(result);
+  return res.status(200).json({ data: result });
 });
 
-app.get("/users/posts/look/:id", (req, res, next) => {
+app.get("/users/posts/:id", async (req, res, next) => {
   const { id } = req.params;
 
-  appDataSource.query(
+  const usersResult = await appDataSource.query(
     `SELECT
-      users.id as userId,
-      users.profile_image as userProfileImage,
-      posts.id as postingId,
-      posts.image_url as postingImageUrl,
-      posts.content as postingContent
-    FROM users
-    INNER JOIN posts ON users.id = posts.user_id
-    WHERE users.id = ${id}`,
-    (err, rows) => {
-      if (err) {
-        return next(err);
-      }
-
-      const postings = rows.map((row) => ({
-        postingId: row.postingId,
-        postingImageUrl: row.postingImageUrl,
-        postingContent: row.postingContent,
-      }));
-
-      const result = {
-        userId: rows[0].userId,
-        userProfileImage: rows[0].userProfileImage,
-        postings: postings,
-      };
-
-      res.status(200).json({ data: result });
-    }
+      users.id AS userId,
+      users.profile_image AS userProfileImage,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+            "postingId", posts.id,
+            "postingImageUrl", posts.image_url,
+            "postingContent", posts.content
+            )
+      ) AS postings
+    FROM posts
+    INNER JOIN users ON posts.user_id = users.id
+    WHERE user_id = ?
+    GROUP BY users.id
+    `,
+    [id]
   );
+  console.log(usersResult);
+  return res.status(200).json({ data: usersResult });
 });
 
 app.listen(port, function () {

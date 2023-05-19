@@ -2,19 +2,18 @@ require("dotenv").config();
 
 const express = require('express')
 const cors = require('cors')
-const logger = require('morgan'); // morgan 모듈 추가하기
+const logger = require('morgan'); 
 const app = express()
 
- 
 app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
 
-// const port = process.env.PORT
+const PORT = process.env.PORT
 
 const { DataSource } = require('typeorm');
 
-const myDataSource = new DataSource({
+const appDataSource = new DataSource({
     type: process.env.DB_CONNECTION,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -23,44 +22,72 @@ const myDataSource = new DataSource({
     database: process.env.DB_DATABASE
 })
 
-myDataSource.initialize()
+
+
+appDataSource.initialize()
     .then(() => {
-        console.log("Data Source has been initialized!")
+        console.log("Data Source has been initialized!") 
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization", err)
+        appDataSource.destroy()
     })
 
+
+
 app.get('/ping', function (req, res, next) {
-  res.status(200).json({message: 'rewe'}) // res.json({message: 'pong'}) ==> res.status(200)으로 바꾸니까 morgan 작동함
+  res.json({message: 'rewe'}) 
 })
 
 app.post('/users/signup', async (req, res) => {
-	const {name, email, profileImage, password} = req.body
+	const { name, email, profileImage, password } = req.body
     
-	await myDataSource.query(
-		`INSERT INTO users(
+	await appDataSource.query(
+	`INSERT INTO users(
 	
-		    name,
-        email,
-		    profile_image,
-        password
+		name,
+    email,
+		profile_image,
+    password
 
-		) VALUES (?, ?, ?, ?);
+	) VALUES (?, ?, ?, ?);
 		`,
 		[name, email, profileImage, password]
 	); 
-     res.status(200).json({ message : "user created" });
+     res.status(200).json({ message : "userCreated" });
 	})
 
-
-  // const start = async () => {
-  //   try {
-  //     app.listen(port, () => console.log(`Server is listening on $(port)`));
+app.post('/posts', async (req, res) => {
+  const {userId, title, content} = req.body
       
-  //     }catch (err){
-  //       console.error(err)
-  //   }
-  // }
+    await appDataSource.query(
+    `INSERT INTO posts(
+
+      user_id,
+      title,
+      content
+          
+    ) VALUES (?, ?, ?);
+      `,
+      [userId, title, content]
+    ); 
+       res.status(200).json({ message : "postCreated" });
+    });
 
 
-app.listen(8000, function () {
-  console.log('server listening on port 8000')
-})
+
+  const start = async () => {
+    try {
+      app.listen(PORT, () => console.log(`Server is listening on ${PORT}`));
+      
+      }catch (err){
+        console.error(err)
+    }
+  }
+
+  start();
+
+
+// app.listen(PORT, function () {
+//   console.log('server listening on port 8000')
+// })

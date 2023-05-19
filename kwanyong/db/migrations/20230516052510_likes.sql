@@ -1,5 +1,4 @@
 -- migrate:up
--- migrate:up
 create table likes (
     id int not null PRIMARY KEY(id)
     user_id int not null,
@@ -9,4 +8,4 @@ create table likes (
 );
 
 -- migrate:down
-
+drop table likes

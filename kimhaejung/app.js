@@ -9,14 +9,6 @@ const { DataSource } = require("typeorm");
 const port = process.env.PORT || 3000;
 const app = express();
 
-app.listen(port, function () {
-  console.log(`server listening on port ${port}`);
-});
-
-app.use(cors());
-app.use(logger("combined"));
-app.use(express.json());
-
 const appDataSource = new DataSource({
   type: process.env.DB_CONNECTION,
   host: process.env.DB_HOST,
@@ -34,6 +26,14 @@ appDataSource
   .catch((err) => {
     console.error("Error during Data Source initialization", err);
   });
+
+app.use(cors());
+app.use(logger("combined"));
+app.use(express.json());
+
+app.listen(port, function () {
+  console.log(`server listening on port ${port}`);
+});
 
 app.get("/ping", function (req, res, next) {
   res.json({ message: "pong" });

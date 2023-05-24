@@ -1,168 +1,33 @@
-require("dotenv").config();
+require("dotenv").config();   //.env 내용을 가져온다
 
-const express = require("express");
-const cors = require("cors");
-const logger = require("morgan");
+const http = require("http");         //사용할 모듈을 변수에 담는다
+const express = require('express');   //express라는 모듈을 express변수에 정의한다
+const cors = require('cors');         //웹 통신에 대한 규약을 변수로 정의
+const logger = require('morgan');     //morgan log히스토리등을 나오게끔 해주는 모듈
 
-const { DataSource } = require("typeorm");
 
-const port = process.env.PORT || 3000;
-const app = express();
+const routes = require("./routes");   //./routes를 불러오는 메서드를 변수에 담는다
 
-const appDataSource = new DataSource({
-  type: process.env.DB_CONNECTION,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-});
-
-appDataSource
-  .initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization", err);
-  });
+const app = express();    //익스프레스메서드를 앱변수에 담는다
 
 app.use(cors());
-app.use(logger("combined"));
-app.use(express.json());
+app.use(logger('dev'));
+app.use(express.json());    //json이란 자바스크립트오브젝트노테이션 데이터를 저장하고 전송하기 위한 경량의 데이터 교환 형식
+app.use(routes);            //라우터를 사용한다
 
-app.listen(port, function () {
-  console.log(`server listening on port ${port}`);
-});
-
-app.get("/ping", function (req, res, next) {
+app.get("/ping", (req, res) => {
   res.json({ message: "pong" });
 });
-//2. 
-app.post("/users/signup", async (req, res, next) => {
-  const { name, email, profileImage, password } = req.body;
 
-  await appDataSource.query(
-    `
-    INSERT INTO users(
-      name,
-      email,
-      profile_image,
-      password
-    ) VALUES (?, ?, ?, ?);
-    `,
-    [name, email, profileImage, password]
-  );
-  res.status(201).json({ message: "userCreated" });
-});
-//3.
-app.post("/posts", async (req, res, next) => {
-  const { title, content, userId, imageUrl } = req.body;
+const server = http.createServer(app);    //서버를 제어하고 사용
+const PORT = process.env.PORT;            //포트
 
-  await appDataSource.query(
-    `
-    INSERT INTO posts(
-      title,
-      content,
-      user_id,
-      image_url
-    ) VALUES (?, ?, ?, ?);
-    `,
-    [title, content, userId, imageUrl]
-  );
-  res.status(201).json({ message: "postCreated" });
-});
-//4.
-app.get("/posts", async (req, res, next) => {
-  const result = await appDataSource.query(`
-    SELECT
-      users.id AS userId,
-      users.profile_image AS userProfileImage,
-      posts.id AS postingId,
-      posts.image_url AS postingImageUrl,
-      posts.content AS postingContent
-    FROM users
-    INNER JOIN posts ON users.id = posts.user_id`);
+const start = async () => {
+  try {
+    server.listen(PORT, () => console.log(`Server is listening on ${PORT}`));   //서버가 정상작동시 콘솔로그로 포트번호와함께 출력
+  } catch (err) {
+    console.error(err);         //에러시 에러
+  }
+};
 
-  console.log(result);
-  return res.status(200).json({ data: result });
-});
-//5.
-app.get("/users/posts/:id", async (req, res, next) => {
-  const { id } = req.params;
-
-  const usersResult = await appDataSource.query(
-    `
-    SELECT
-      users.id AS userId,
-      users.profile_image AS userProfileImage,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-            "postingId", posts.id,
-            "postingImageUrl", posts.image_url,
-            "postingContent", posts.content
-            )
-      ) AS postings
-    FROM posts
-    INNER JOIN users ON posts.user_id = users.id
-    WHERE user_id = ?
-    GROUP BY users.id
-    `,
-    [id]
-  );
-  console.log(usersResult);
-  return res.status(200).json({ data: usersResult });
-});
-//6.
-app.patch("/posts/:postId", async (req, res, next) => {
-  const { postId } = req.params;
-  const { content, userId } = req.body;
-  await appDataSource.query(
-    `
-    UPDATE 
-      posts 
-    SET content=? 
-    WHERE user_id=? AND id=?;
-    `,
-    [content, userId, postId]
-  );
-
-  const updatedPosts = await appDataSource.query(`
-    SELECT
-      users.id AS userId,
-      users.name AS userName,
-      posts.id AS postingId,
-      posts.title AS postingTitle,
-      posts.content AS postingContent
-    FROM users 
-    INNER JOIN posts ON posts.user_id = users.id
-    WHERE users.id=${userId} AND posts.id=${postId};
-      `);
-
-  console.log(updatedPosts);
-  res.status(200).json({ data: updatedPosts });
-});
-//7.
-app.delete("/posts/:id", async (req, res) => {
-  const { id } = req.params;
-  const result = await appDataSource.query(`
-    DELETE
-    FROM posts
-    WHERE id = ${id}
-    `);
-  console.log(result);
-  res.status(200).json({ message: "PostingDeleted" });
-});
-//8.
-app.post("/likes/users/:userId/posts/:postId", async (req, res, next) => {
-  const { userId, postId } = req.params;
-
-  const likesCreated = await appDataSource.query(`
-    INSERT INTO likes(
-      user_id, 
-      post_id
-      ) VALUES (${userId}, ${postId});
-        `);
-  console.log(likesCreated);
-  res.status(204).json({ message: "likeCreated" });
-});
+start();            //시작메서드

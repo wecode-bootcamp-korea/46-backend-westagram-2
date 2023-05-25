@@ -76,14 +76,14 @@ const updatedPost = async (content, userId, postId) => {
   }
 };
 
-const deletedPost = async (userId, postId) => {
+const deletedPost = async (postId, userId) => {
   try {
     return await appDataSource.query(
       `
       DELETE FROM posts 
       WHERE posts.user_id= ? AND posts.id = ?
       `,
-      [userId, postId]
+      [postId, userId]
     );
   } catch (err) {
     console.log(`err: ${err}`);

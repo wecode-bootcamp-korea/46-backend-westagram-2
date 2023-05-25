@@ -48,7 +48,8 @@ const updatedPost = async (req, res) => {
 
 const deletedPost = async (req, res) => {
   try {
-    const { userId, postId } = req.body;
+    const { postId } = req.params;
+    const { userId } = req.body;
     await postService.deletedPost(userId, postId);
     return res.status(204).json({ message: "Posting Deleted" });
   } catch (err) {

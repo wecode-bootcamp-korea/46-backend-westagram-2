@@ -4,6 +4,10 @@ const posting = async (req, res) => {
   try {
     const { title, content, userId, imageUrl } = req.body;
 
+    if (!title || !content || !userId) {
+      return res.status(400).json({ message: "KEY_ERROR" });
+    }
+
     await postService.posting(title, content, userId, imageUrl);
     return res.status(201).json({
       message: "POST_CREATED",
@@ -24,10 +28,10 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-const getIdPosts = async (req, res) => {
+const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const userPost = await postService.getIdPosts(userId);
+    const userPost = await postService.getUserPosts(userId);
     return res.status(200).json({ data: userPost });
   } catch (err) {
     console.log(err);
@@ -35,10 +39,10 @@ const getIdPosts = async (req, res) => {
   }
 };
 
-const updatedPost = async (req, res) => {
+const updatePost = async (req, res) => {
   try {
     const { content, userId, postId } = req.body;
-    await postService.updatedPost(content, userId, postId);
+    await postService.updatePost(content, userId, postId);
     return res.status(200).json({ message: "Post Updated" });
   } catch (err) {
     console.log(err);
@@ -46,11 +50,10 @@ const updatedPost = async (req, res) => {
   }
 };
 
-const deletedPost = async (req, res) => {
+const deletePost = async (req, res) => {
   try {
-    const { postId } = req.params;
-    const { userId } = req.body;
-    await postService.deletedPost(userId, postId);
+    const { postId, userId } = req.params;
+    await postService.deletePost(userId, postId);
     return res.status(204).json({ message: "Posting Deleted" });
   } catch (err) {
     console.log(err);
@@ -61,7 +64,7 @@ const deletedPost = async (req, res) => {
 module.exports = {
   posting,
   getAllPosts,
-  getIdPosts,
-  updatedPost,
-  deletedPost,
+  getUserPosts,
+  updatePost,
+  deletePost,
 };

@@ -16,7 +16,7 @@ const createPost = async (title, content, userId, imageUrl) => {
     );
   } catch (err) {
     const error = new Error("INVALID_DATA_INPUT");
-    error.statusCode = 500;
+    error.statusCode = 400;
     throw error;
   }
 };
@@ -36,7 +36,7 @@ const getAllPosts = async () => {
   }
 };
 
-const getIdPosts = async (userId) => {
+const getUserPosts = async (userId) => {
   try {
     return await appDataSource.query(
       `
@@ -62,7 +62,7 @@ const getIdPosts = async (userId) => {
   }
 };
 
-const updatedPost = async (content, userId, postId) => {
+const updatePost = async (content, userId, postId) => {
   try {
     return await appDataSource.query(
       `
@@ -76,7 +76,7 @@ const updatedPost = async (content, userId, postId) => {
   }
 };
 
-const deletedPost = async (postId, userId) => {
+const deletePost = async (postId, userId) => {
   try {
     return await appDataSource.query(
       `
@@ -93,7 +93,7 @@ const deletedPost = async (postId, userId) => {
 module.exports = {
   createPost,
   getAllPosts,
-  getIdPosts,
-  updatedPost,
-  deletedPost,
+  getUserPosts,
+  updatePost,
+  deletePost,
 };

@@ -9,30 +9,30 @@ const getAllPosts = () => {
   return postDao.getAllPosts();
 };
 
-const getIdPosts = async (userId) => {
+const getUserPosts = async (userId) => {
   try {
-    return postDao.getIdPosts(userId);
+    return postDao.getUserPosts(userId);
   } catch (err) {
-    const error = new Error("Could not get post");
+    const error = new Error("COULD_NOT_GET_POST");
     error.statusCode = 404;
     throw error;
   }
 };
 
-const updatedPost = async (content, userId, postId) => {
-  const postUpdate = await postDao.updatedPost(content, userId, postId);
+const updatePost = async (content, userId, postId) => {
+  const postUpdate = await postDao.updatePost(content, userId, postId);
   return postUpdate;
 };
 
-const deletedPost = async (userId, postId) => {
-  const postDelete = await postDao.deletedPost(userId, postId);
+const deletePost = async (userId, postId) => {
+  const postDelete = await postDao.deletePost(userId, postId);
   return postDelete;
 };
 
 module.exports = {
   posting,
   getAllPosts,
-  getIdPosts,
-  updatedPost,
-  deletedPost,
+  getUserPosts,
+  updatePost,
+  deletePost,
 };

@@ -15,7 +15,7 @@ const createUser = async (name, email, password, profileImage) => {
   } catch (err) {
     console.log(err);
     const error = new Error("INVALID_DATA_INPUT");
-    error.statusCode = 500;
+    error.statusCode = 400;
     throw error;
   }
 };
@@ -35,7 +35,7 @@ const findUser = async (email) => {
   } catch (err) {
     console.log(err);
     const error = new Error("INVALID_DATA_INPUT");
-    error.statusCode = 500;
+    error.statusCode = 400;
     throw error;
   }
 };

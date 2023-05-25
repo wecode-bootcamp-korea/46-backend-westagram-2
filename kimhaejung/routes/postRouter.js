@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.post("", validateToken, postController.posting);
 router.get("", postController.getAllPosts);
-router.get("/users/:userId", postController.getIdPosts);
-router.patch("", postController.updatedPost);
-router.delete("", postController.deletedPost);
+router.get("/users/:userId", postController.getUserPosts);
+router.patch("", postController.updatePost);
+router.delete("/:postId/users/:userId", postController.deletePost);
 
 module.exports = {
   router,

@@ -5,11 +5,10 @@ const validateToken = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token) {
-      return res.status(403).send("Invalid_Access_Token");
+      return res.status(401).send("Invalid_Access_Token");
     }
 
     const decoded = await jwt.verify(token, process.env.SECRETKEY);
-    console.log(decoded);
     req.user = decoded.userId;
 
     next();

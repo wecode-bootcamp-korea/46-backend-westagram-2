@@ -1,6 +1,6 @@
 const postService = require('../services/postService')
 
-const postUp = async (req, res) => {
+const createPost = async (req, res) => {
   try {
     const { userId, title, content } = req.body
 
@@ -13,25 +13,21 @@ const postUp = async (req, res) => {
     res.status(201).json({ message: 'POSTUP_SUCCESS' })
   } catch (err) {
     console.log(err)
-    return res.status(err.statusCode || 500).json({ message: err.message })
+    return res.status(err.statusCode || 400).json({ message: err.message })
   }
 }
 
-// const postService = require('../services/postService')
-
-const getAll = async (res) => {
+const getAllPost = async (res) => {
   try {
-    const postsData = await postService.getIn()
+    const postsData = await postService.getPost()
     return res.status(200).json({ data: postsData })
   } catch (err) {
     console.log(err)
-    return res.status(err.statusCode || 500).json({ message: err.message })
+    return res.status(err.statusCode || 400).json({ message: err.message })
   }
 }
 
-// const postService = require('../services/postService')
-
-const revisePost = async (req, res) => {
+const updatePost = async (req, res) => {
   try {
     const { title, content, userId, postId } = req.body
 
@@ -42,7 +38,7 @@ const revisePost = async (req, res) => {
     res.status(201).json({ message: 'POST_UPDATE_SUCCESS' })
   } catch (err) {
     console.log(err)
-    return res.status(err.statusCode || 500).json({ message: err.message })
+    return res.status(err.statusCode || 400).json({ message: err.message })
   }
 }
 
@@ -58,34 +54,13 @@ const deletePost = async (req, res) => {
     res.status(201).json({ message: 'POST_DELETE_SUCCESS' })
   } catch (err) {
     console.log(err)
-    return res.status(err.statusCode || 500).json({ message: err.message })
+    return res.status(err.statusCode || 400).json({ message: err.message })
   }
 }
 
-// app.post('/likes/:userId/:postId', async (req, res) => {
-//   const { userId, postId } = req.params
-
-//   await appDataSource.query(
-//     `INSERT INTO likes(
-//           user_id = ?
-//           post_id = ?
-//       ) VALUES (${userId}, ${postId});
-//       `
-//   )
-//   res.status(200).json({ message: 'likeCreated' })
-// })
-
-// app.delete('/posts/:postId', async (req, res) => {
-//   const { postId } = req.params
-
-//   await appDataSource.query(`DELETE FROM posts WHERE posts.id = ${postId}`)
-
-//   res.status(204).json({ message: 'successfully deleted' })
-// })
-
 module.exports = {
-  postUp,
-  getAll,
-  revisePost,
+  createPost,
+  getAllPost,
+  updatePost,
   deletePost,
 }

@@ -1,11 +1,12 @@
 const express = require('express')
 const postController = require('../Controllers/postController')
 const router = express.Router()
+const { loginRequired } = require('../middleware/auth')
 
-router.post('/post', postController.postUp)
-router.get('/post', postController.getAll)
-router.patch('/post/:postId', postController.revisePost)
-router.delete('/post/:postId', postController.deletePost)
+router.post('/post', loginRequired, postController.createPost)
+router.get('/post', loginRequired, postController.getAllPost)
+router.patch('/post/:postId', loginRequired, postController.updatePost)
+router.delete('/post/:postId', loginRequired, postController.deletePost)
 
 module.exports = {
   router,

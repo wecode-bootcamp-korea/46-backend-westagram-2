@@ -1,11 +1,12 @@
 const postDao = require('../models/postDao')
 
-const postIn = async (userId, title, content) => {
+const createPost = async (userId, title, content) => {
   const createPost = await postDao.createPost(userId, title, content)
+  console.log(createPost)
   return createPost
 }
 
-const getIn = async () => {
+const getPost = async () => {
   const getPost = await postDao.getPost()
   return getPost
 }
@@ -21,8 +22,8 @@ const erasePost = async (postId) => {
 }
 
 module.exports = {
-  postIn,
-  getIn,
+  createPost,
+  getPost,
   updatePost,
   erasePost,
 }
